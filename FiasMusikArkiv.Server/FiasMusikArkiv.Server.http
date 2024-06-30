@@ -1,0 +1,6 @@
+@FiasMusikArkiv.Server_HostAddress = http://localhost:5249
+
+GET {{FiasMusikArkiv.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
