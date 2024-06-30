@@ -1,3 +1,4 @@
+using FiasMusikArkiv.Server.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiasMusikArkiv.Server.Controllers
