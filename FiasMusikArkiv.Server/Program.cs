@@ -1,5 +1,6 @@
 using FiasMusikArkiv.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<FiasMusikArkivDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Application"));
 });
+
+builder.Services.AddScoped<IDbContextSeeder, FiasMusikArkivDbContext>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,5 +37,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+using (var seedScope = app.Services.CreateScope())
+{
+    var seeder = seedScope.ServiceProvider.GetService<IDbContextSeeder>();
+    seeder.EnsureSeedData();
+}
 
 app.Run();
