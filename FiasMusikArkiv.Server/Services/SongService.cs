@@ -1,13 +1,15 @@
 ﻿using FiasMusikArkiv.Server.Data;
+using FiasMusikArkiv.Server.Data.DTOs;
 using FiasMusikArkiv.Server.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace FiasMusikArkiv.Server.Services;
 public interface ISongService
 {
-    Task<IEnumerable<Song>> GetAllSongsAsync();
+    Task<IEnumerable<SongDto>> GetAllSongsAsync();
     Task<Song> GetSongByIdAsync(int id);
     Task<Song> AddSongAsync(Song song);
     Task UpdateSongAsync(Song song);
@@ -17,17 +19,22 @@ public interface ISongService
 public class SongService : ISongService
 {
     private readonly FiasMusikArkivDbContext _dbContext;
+    private readonly IMapper _mapper;
 
     public SongService(
-        FiasMusikArkivDbContext context
+        FiasMusikArkivDbContext context, IMapper mapper
         )
     {
         _dbContext = context;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Song>> GetAllSongsAsync()
+    public async Task<IEnumerable<SongDto>> GetAllSongsAsync()
     {
-        return await _dbContext.Songs.ToListAsync();
+        return (await _dbContext.Songs
+            .ToListAsync())
+            .Select(song => _mapper.Map<SongDto>(song))
+            .ToList();
     }
     public async Task<Song> GetSongByIdAsync(int id)
     {

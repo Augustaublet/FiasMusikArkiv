@@ -1,3 +1,5 @@
+using AutoMapper;
+using FiasMusikArkiv.Server.Configuration;
 using FiasMusikArkiv.Server.Data;
 using FiasMusikArkiv.Server.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<FiasMusikArkivDbContext>(options =>
 
 builder.Services.AddScoped<IDbContextSeeder, FiasMusikArkivDbContext>();
 builder.Services.AddScoped<ISongService, SongService>();
+builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
