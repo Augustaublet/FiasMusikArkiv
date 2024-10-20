@@ -42,7 +42,7 @@ namespace FiasMusikArkiv.Server.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "InternalServerError");
+                return StatusCode(500, "Internal Server Error");
             }
             
         }
@@ -59,17 +59,32 @@ namespace FiasMusikArkiv.Server.Controllers
         {
             if (id != song.Id)
             {
-                return BadRequest();
+                return BadRequest("Id in URL does not match Id in song object.");
             }
-            await _songService.UpdateSongAsync(song);
-            return NoContent();
+
+            try
+            {
+                await _songService.UpdateSongAsync(song);
+                return NoContent();
+            }      
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSong(int id)
         {
-            await _songService.DeleteSongAsync(id);
-            return NoContent();
+            try
+            {
+                await _songService.DeleteSongAsync(id);
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

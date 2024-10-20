@@ -7,6 +7,7 @@ using FiasMusikArkiv.Server.Services;
 using System.Collections.Generic;
 using FiasMusikArkiv.Server.Data.DTOs;
 using NSubstitute.ExceptionExtensions;
+using FiasMusikArkiv.Server.Data.Models;
 
 namespace FiasMusikArkiv.Test
 {
@@ -103,6 +104,99 @@ namespace FiasMusikArkiv.Test
             // Assert
             var statusCodeResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, statusCodeResult.StatusCode);
+        }
+        [Fact]
+        public async Task UpdateSong_UpdatesSong_AndReturnsNoContent()
+        {
+            // Arrange
+            int id = 1;
+            var song = new Song { Id = id, Name = "Updated Song" };
+
+            _songService.UpdateSongAsync(song).Returns(Task.CompletedTask);
+
+            // Skapa en instans av SongController med mocken
+            var controller = new SongController(_songService);
+
+            // Act
+            var result = await controller.UpdateSong(id, song);
+
+            // Assert
+            // Verifiera att tjänsten anropades med rätt data
+            await _songService.Received(1).UpdateSongAsync(song);
+
+            // Kontrollera att resultatet är NoContent
+            Assert.IsType<NoContentResult>(result);
+        }
+        [Fact]
+        public async Task UpdateSong_ReturnsBadRequest_WhenIdMismatch()
+        {
+            // Arrange
+            int idFraUrl = 1;
+            var song = new Song { Id = 2, Name = "Updated Song" };
+
+            // Act
+            var result = await _controller.UpdateSong(idFraUrl, song);
+
+            // Assert
+            await _songService.DidNotReceiveWithAnyArgs().UpdateSongAsync(Arg.Any<Song>());
+
+            // Sjekk at resultatet er BadRequest
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+        [Fact]
+        public async Task UpdateSong_ReturnsInternalServerError_WhenExceptionOccurs()
+        {
+            // Arrange
+            int id = 1;
+            var song = new Song { Id = id, Name = "Updated Song" };
+            _songService.When(s => s.UpdateSongAsync(song)).Do(x => { throw new Exception("Simulerat undantag"); });
+
+            // Act
+            var result = await _controller.UpdateSong(id, song);
+
+            // Assert
+            // Verifiera att tjänsten anropades
+            await _songService.Received(1).UpdateSongAsync(song);
+
+            // Kontrollera att resultatet är InternalServerError
+            Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, ((ObjectResult)result).StatusCode);
+        }
+        [Fact]
+        public async Task DeleteSong_DeletesSong_AndReturnsNoContent()
+        {
+            // Arrange
+            int id = 1;
+
+            _songService.DeleteSongAsync(id).Returns(Task.CompletedTask);
+
+            var controller = new SongController(_songService);
+
+            // Act
+            var result = await controller.DeleteSong(id);
+
+            // Assert
+            await _songService.Received(1).DeleteSongAsync(id);
+            Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteSong_ReturnsInternalServerError_WhenExceptionOccurs()
+        {
+            // Arrange
+            int id = 1;
+
+            _songService.When(s => s.DeleteSongAsync(id)).Do(x => { throw new Exception("Simulerat undantag"); });
+
+            var controller = new SongController(_songService);
+
+            // Act
+            var result = await controller.DeleteSong(id);
+
+            // Assert
+            await _songService.Received(1).DeleteSongAsync(id);
+            Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, ((ObjectResult)result).StatusCode);
         }
     }
 }
