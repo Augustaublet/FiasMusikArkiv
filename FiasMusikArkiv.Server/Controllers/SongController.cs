@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FiasMusikArkiv.Server.Services;
 using FiasMusikArkiv.Server.Data.Models;
+using FiasMusikArkiv.Server.Data.DTOs;
 
 namespace FiasMusikArkiv.Server.Controllers
 {
@@ -30,18 +31,26 @@ namespace FiasMusikArkiv.Server.Controllers
         [HttpGet("{id}", Name = "GetSong")]
         public async Task<IActionResult> GetSong(int id)
         {
-            var song = await _songService.GetSongByIdAsync(id);
-            if (song == null)
+            try
             {
-                return NotFound();
+                var song = await _songService.GetSongByIdAsync(id);
+                if (song == null)
+                {
+                    return NotFound();
+                }
+                return Ok(song);
             }
-            return Ok(song);
+            catch (Exception)
+            {
+                return StatusCode(500, "InternalServerError");
+            }
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> AddSong(Song song)
         {
-            Song newSong = await _songService.AddSongAsync(song);
+            var newSong = await _songService.AddSongAsync(song);
             return CreatedAtRoute("GetSong", new { id = newSong.Id }, newSong);
         }
 
