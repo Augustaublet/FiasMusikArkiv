@@ -10,8 +10,8 @@ namespace FiasMusikArkiv.Server.Services;
 public interface ISongService
 {
     Task<IEnumerable<SongDto>> GetAllSongsAsync();
-    Task<Song> GetSongByIdAsync(int id);
-    Task<Song> AddSongAsync(Song song);
+    Task<SongDto> GetSongByIdAsync(int id);
+    Task<SongDto> AddSongAsync(Song song);
     Task UpdateSongAsync(Song song);
     Task DeleteSongAsync(int id);
 }
@@ -36,16 +36,17 @@ public class SongService : ISongService
             .Select(song => _mapper.Map<SongDto>(song))
             .ToList();
     }
-    public async Task<Song> GetSongByIdAsync(int id)
+    public async Task<SongDto> GetSongByIdAsync(int id)
     {
-        return await _dbContext.Songs.FirstOrDefaultAsync(song => song.Id == id);
+        var song = await _dbContext.Songs.FirstOrDefaultAsync(song => song.Id == id);
+        return _mapper.Map<SongDto>(song);
     }
 
-    public async Task<Song> AddSongAsync(Song song)
+    public async Task<SongDto> AddSongAsync(Song song)
     {
         await _dbContext.Songs.AddAsync(song);
         await _dbContext.SaveChangesAsync();
-        return song;
+        return _mapper.Map<SongDto>(song);
     }
 
     public async Task UpdateSongAsync(Song song)
