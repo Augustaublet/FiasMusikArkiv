@@ -6,6 +6,7 @@ using FiasMusikArkiv.Server.Controllers;
 using FiasMusikArkiv.Server.Services;
 using System.Collections.Generic;
 using FiasMusikArkiv.Server.Data.DTOs;
+using NSubstitute.ExceptionExtensions;
 
 namespace FiasMusikArkiv.Test
 {
@@ -56,6 +57,52 @@ namespace FiasMusikArkiv.Test
 
             // Assert
             Assert.IsType<NotFoundResult>(result); // Kolla att vi får en NotFound-result
+        }
+        [Fact]
+        public async Task GetSongByIdAsync_ReturnsOkResult_WithCorrectSong()
+        {
+            // Arrange
+            int songId = 1;
+            var expectedSong = new SongDto { Id = songId, Name = "Test Song" };
+            _songService.GetSongByIdAsync(songId).Returns(expectedSong);
+
+            // Act
+            var result = await _controller.GetSong(songId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnedSong = Assert.IsType<SongDto>(okResult.Value);
+            Assert.Equal(expectedSong.Id, returnedSong.Id);
+            Assert.Equal(expectedSong.Name, returnedSong.Name);
+        }
+
+        [Fact]
+        public async Task GetSongByIdAsync_ReturnsNotFound_WhenSongDoesNotExist()
+        {
+            // Arrange
+            int songId = 1;
+            _songService.GetSongByIdAsync(songId).Returns((SongDto)null);
+
+            // Act
+            var result = await _controller.GetSong(songId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task GetSongByIdAsync_ReturnsInternalServerError_WhenExceptionOccurs()
+        {
+            // Arrange
+            int songId = 1;
+            _songService.GetSongByIdAsync(songId).Throws<Exception>();
+
+            // Act
+            var result = await _controller.GetSong(songId);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
         }
     }
 }
