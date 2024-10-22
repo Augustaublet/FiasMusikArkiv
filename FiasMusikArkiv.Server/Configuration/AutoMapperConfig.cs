@@ -11,16 +11,17 @@ public static class AutoMapperConfig
     {
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<SongProfile>();
+            cfg.AddProfile<ApiProfile>();
         });
 
         Mapper = config.CreateMapper();
     }
-    public class SongProfile : Profile
+    public class ApiProfile : Profile
     {
-        public SongProfile()
+        public ApiProfile()
         {
-            CreateMap<Song, SongDto>();
+            CreateMap<Song, SongDto>()
+                .ForMember(x=>x.Genre, opt=>opt.MapFrom(src=>src.Genre.ToString()));
         }
     }
 }

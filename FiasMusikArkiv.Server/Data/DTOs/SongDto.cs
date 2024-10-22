@@ -11,6 +11,6 @@ namespace FiasMusikArkiv.Server.Data.DTOs
         [MaxLength(255)]
         public string Name { get; set; }
         public string? Description { get; set; }
-        public int GenreId { get; set; } // Assuming GenreCode has an integer Id property
+        public string Genre { get; set; } // Assuming GenreCode has an integer Id property
     }
 }

@@ -31,8 +31,8 @@ namespace FiasMusikArkiv.Test
             // Arrange
             var mockSongs = new List<SongDto>
         {
-            new SongDto { Id = 1, Name = "Song 1", Description = "Description 1", GenreId= 1},
-            new SongDto { Id = 1, Name = "Song 2", Description = "Description 2", GenreId= 1 }
+            new SongDto { Id = 1, Name = "Song 1", Description = "Description 1", Genre= "Hambo"},
+            new SongDto { Id = 1, Name = "Song 2", Description = "Description 2", Genre= "Hambo" }
         };
 
             // Mock tjänsten att returnera en lista av sånger
