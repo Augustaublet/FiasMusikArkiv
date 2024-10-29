@@ -9,7 +9,8 @@ namespace FiasMusikArkiv.Server.Data.Models
         public string Name { get; set; }
         [MaxLength(512)]
         public string? Description { get; set; }
-        [ForeignKey("Genres")]
-        public virtual GenreCode Genre { get; set; }
+        [ForeignKey("CodeGenre")]
+        public virtual CodeGenre Genre { get; set; }
+        public string GenreCode { get; set; }
     }
 }

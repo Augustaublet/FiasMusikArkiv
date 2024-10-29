@@ -12,18 +12,37 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FiasMusikArkiv.Server.Migrations
 {
     [DbContext(typeof(FiasMusikArkivDbContext))]
-    [Migration("20240702191229_InitMigration")]
-    partial class InitMigration
+    [Migration("20241029203950_InitCreate")]
+    partial class InitCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("FiasMusikArkiv.Server.Data.Models.CodeGenre", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("CodeGenre");
+                });
 
             modelBuilder.Entity("FiasMusikArkiv.Server.Data.Models.Song", b =>
                 {
@@ -32,6 +51,9 @@ namespace FiasMusikArkiv.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodeGenre")
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -42,6 +64,11 @@ namespace FiasMusikArkiv.Server.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("GenreCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -51,7 +78,18 @@ namespace FiasMusikArkiv.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Song");
+                    b.HasIndex("CodeGenre");
+
+                    b.ToTable("Songs");
+                });
+
+            modelBuilder.Entity("FiasMusikArkiv.Server.Data.Models.Song", b =>
+                {
+                    b.HasOne("FiasMusikArkiv.Server.Data.Models.CodeGenre", "Genre")
+                        .WithMany()
+                        .HasForeignKey("CodeGenre");
+
+                    b.Navigation("Genre");
                 });
 #pragma warning restore 612, 618
         }
