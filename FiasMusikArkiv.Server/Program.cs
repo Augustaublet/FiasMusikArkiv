@@ -16,6 +16,17 @@ builder.Services.AddDbContext<FiasMusikArkivDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Application"));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:5173") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddScoped<IDbContextSeeder, FiasMusikArkivDbContext>();
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
@@ -25,6 +36,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseCors("AllowFrontend");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
