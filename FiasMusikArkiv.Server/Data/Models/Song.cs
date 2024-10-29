@@ -6,8 +6,9 @@ namespace FiasMusikArkiv.Server.Data.Models
     public class Song : BaseModel
     {
         [MaxLength(255)]
-        public String Name { get; set; }
-        public String? Description { get; set; }
+        public string Name { get; set; }
+        [MaxLength(512)]
+        public string? Description { get; set; }
         [ForeignKey("Genres")]
         public virtual GenreCode Genre { get; set; }
     }
